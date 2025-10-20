@@ -35,6 +35,7 @@ const Calendar = ({
   onBlockedDateToggle,
 }: CalendarProps) => {
   const [showVotersFor, setShowVotersFor] = useState<string | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | null>(null);
 
   const months = getSummerMonths();
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -208,25 +209,15 @@ const Calendar = ({
             className="absolute -top-2 -right-2 bg-gradient-to-br from-green-500 to-emerald-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg cursor-pointer z-20"
             onClick={(e) => {
               e.stopPropagation();
+              const rect = e.currentTarget.getBoundingClientRect();
+              setTooltipPosition({
+                top: rect.bottom + window.scrollY + 8,
+                left: rect.left + window.scrollX
+              });
               setShowVotersFor(showVotersFor === chunk.id ? null : chunk.id);
             }}
           >
             {voteCount}
-          </div>
-        )}
-
-        {/* Voters tooltip */}
-        {showVotersFor === chunk?.id && isStart && (
-          <div className="absolute top-full left-0 mt-2 bg-white opacity-100 text-gray-900 text-sm rounded-lg px-4 py-3 shadow-2xl border-2 border-gray-800 z-50 whitespace-nowrap" style={{ backgroundColor: '#ffffff', opacity: 1 }}>
-            <div className="font-bold mb-2 text-gray-900">{formatChunk(chunk)}</div>
-            <div className="space-y-1.5">
-              {getVotersForChunk(chunk.id).map(name => (
-                <div key={name} className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full" />
-                  <span className="font-medium text-gray-900">{name}</span>
-                </div>
-              ))}
-            </div>
           </div>
         )}
       </div>
@@ -274,7 +265,7 @@ const Calendar = ({
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full relative">
       {/* Desktop: 2-column grid for months */}
       <div className="hidden md:grid md:grid-cols-2 md:gap-6">
         {months.map(renderMonth)}
@@ -284,6 +275,48 @@ const Calendar = ({
       <div className="md:hidden space-y-6">
         {months.map(renderMonth)}
       </div>
+
+      {/* Voters tooltip - rendered outside grid to avoid z-index issues */}
+      {showVotersFor && tooltipPosition && poll && (
+        <>
+          {/* Overlay to close tooltip */}
+          <div
+            className="fixed inset-0 z-[100]"
+            onClick={() => {
+              setShowVotersFor(null);
+              setTooltipPosition(null);
+            }}
+          />
+          {/* Tooltip */}
+          <div
+            className="fixed z-[101] bg-white text-gray-900 text-sm rounded-lg px-4 py-3 shadow-2xl border-2 border-gray-800 whitespace-nowrap"
+            style={{
+              top: `${tooltipPosition.top}px`,
+              left: `${tooltipPosition.left}px`,
+              backgroundColor: '#ffffff',
+              opacity: 1
+            }}
+          >
+            {(() => {
+              const chunk = poll.dateChunks.find(c => c.id === showVotersFor);
+              if (!chunk) return null;
+              return (
+                <>
+                  <div className="font-bold mb-2 text-gray-900">{formatChunk(chunk)}</div>
+                  <div className="space-y-1.5">
+                    {getVotersForChunk(chunk.id).map(name => (
+                      <div key={name} className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                        <span className="font-medium text-gray-900">{name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </>
+      )}
     </div>
   );
 };
