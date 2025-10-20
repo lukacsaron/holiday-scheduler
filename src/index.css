@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen;
+  }
+}
+
+@layer components {
+  /* Button styles */
+  .btn-primary {
+    @apply px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 border border-gray-200;
+  }
+
+  .btn-sm {
+    @apply px-4 py-2 text-sm;
+  }
+
+  /* Input styles */
+  .input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all;
+  }
+
+  /* Card styles */
+  .card {
+    @apply bg-white rounded-xl shadow-lg p-6;
+  }
+
+  /* Calendar day cell */
+  .calendar-day {
+    @apply aspect-square flex items-center justify-center text-sm cursor-pointer transition-all duration-200;
+  }
+
+  /* Date chunk highlight */
+  .chunk-selected {
+    @apply bg-gradient-to-br from-blue-400 to-purple-400 text-white font-semibold;
+  }
+
+  .chunk-hoverable {
+    @apply hover:bg-blue-100 hover:scale-105;
+  }
+
+  /* Vote indicator */
+  .vote-dot {
+    @apply w-2 h-2 rounded-full;
+  }
+
+  /* Mobile drawer */
+  .drawer {
+    @apply fixed inset-y-0 right-0 w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50;
+  }
+
+  .drawer-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 z-40;
+  }
+}

@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  holiday-scheduler:
+    build: .
+    ports:
+      - "3001:3001"
+    volumes:
+      # Persist database
+      - ./data:/app/server/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - USE_SQLITE=true
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
