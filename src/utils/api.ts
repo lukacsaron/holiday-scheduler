@@ -1,6 +1,9 @@
 import { Poll, Vote } from '../types';
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001';
+// In production, use the same origin (no absolute URL needed since backend serves frontend)
+// In development, use the VITE_API_URL or default to localhost:3001
+const API_BASE_URL = (import.meta as any).env?.VITE_API_URL ||
+  ((import.meta as any).env?.MODE === 'production' ? '' : 'http://localhost:3001');
 
 export const api = {
   // Create a new poll
