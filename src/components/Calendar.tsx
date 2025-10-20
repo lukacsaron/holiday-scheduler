@@ -217,13 +217,13 @@ const Calendar = ({
 
         {/* Voters tooltip */}
         {showVotersFor === chunk?.id && isStart && (
-          <div className="absolute top-full left-0 mt-2 bg-white text-gray-900 text-sm rounded-lg px-4 py-3 shadow-2xl border-2 border-gray-300 z-50 whitespace-nowrap animate-scale-in">
-            <div className="font-bold mb-2 text-gray-800">{formatChunk(chunk)}</div>
+          <div className="absolute top-full left-0 mt-2 bg-white opacity-100 text-gray-900 text-sm rounded-lg px-4 py-3 shadow-2xl border-2 border-gray-800 z-50 whitespace-nowrap" style={{ backgroundColor: '#ffffff', opacity: 1 }}>
+            <div className="font-bold mb-2 text-gray-900">{formatChunk(chunk)}</div>
             <div className="space-y-1.5">
               {getVotersForChunk(chunk.id).map(name => (
                 <div key={name} className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full" />
-                  <span className="font-medium">{name}</span>
+                  <span className="font-medium text-gray-900">{name}</span>
                 </div>
               ))}
             </div>
