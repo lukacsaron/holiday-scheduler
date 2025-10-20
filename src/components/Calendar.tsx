@@ -209,11 +209,16 @@ const Calendar = ({
             className="absolute -top-2 -right-2 bg-gradient-to-br from-green-500 to-emerald-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg cursor-pointer z-20"
             onClick={(e) => {
               e.stopPropagation();
-              const rect = e.currentTarget.getBoundingClientRect();
-              setTooltipPosition({
-                top: rect.bottom + window.scrollY + 8,
-                left: rect.left + window.scrollX
-              });
+              const badge = e.currentTarget;
+              const container = badge.closest('.w-full.relative');
+              if (container) {
+                const badgeRect = badge.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                setTooltipPosition({
+                  top: badgeRect.bottom - containerRect.top + 8,
+                  left: badgeRect.left - containerRect.left
+                });
+              }
               setShowVotersFor(showVotersFor === chunk.id ? null : chunk.id);
             }}
           >
@@ -289,7 +294,7 @@ const Calendar = ({
           />
           {/* Tooltip */}
           <div
-            className="fixed z-[101] bg-white text-gray-900 text-sm rounded-lg px-4 py-3 shadow-2xl border-2 border-gray-800 whitespace-nowrap"
+            className="absolute z-[101] bg-white text-gray-900 text-sm rounded-lg px-4 py-3 shadow-2xl border-2 border-gray-800 whitespace-nowrap"
             style={{
               top: `${tooltipPosition.top}px`,
               left: `${tooltipPosition.left}px`,
