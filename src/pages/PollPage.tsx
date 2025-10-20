@@ -153,13 +153,41 @@ const PollPage = () => {
           </div>
         </div>
 
-        {/* Instructions */}
+        {/* Instructions & Legend */}
         {selectedParticipant && (
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 animate-slide-up" style={{ animationDelay: '150ms' }}>
-            <p className="text-sm text-blue-900">
-              <span className="font-semibold">Tip:</span> Click on any highlighted date range to vote. Click again to remove your vote.
-              {' '}Green rings show dates you've voted for. Numbers show total votes.
-            </p>
+          <div className="space-y-4 mb-6 animate-slide-up" style={{ animationDelay: '150ms' }}>
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
+              <p className="text-sm text-blue-900">
+                <span className="font-semibold">Tip:</span> Click on any highlighted date range to vote. Click again to remove your vote.
+              </p>
+            </div>
+
+            {/* Color Legend */}
+            <div className="card">
+              <h3 className="font-semibold text-gray-900 mb-3">Legend:</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded bg-gradient-to-br from-green-400 to-emerald-500 border-2 border-green-600 flex-shrink-0"></div>
+                  <span className="font-semibold text-green-700">Your votes</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded bg-gradient-to-br from-blue-100 to-purple-100 border border-blue-300 flex-shrink-0"></div>
+                  <span className="text-gray-700">Others voted</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded bg-gradient-to-br from-gray-50 to-gray-100 border border-blue-300 flex-shrink-0"></div>
+                  <span className="text-gray-700">Available (no votes)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-700">Blocked dates</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 

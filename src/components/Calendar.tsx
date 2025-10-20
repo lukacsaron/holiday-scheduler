@@ -141,6 +141,12 @@ const Calendar = ({
     const chunk = getChunkForDate(date);
     const voteCount = chunk ? getVoteCountForChunk(chunk.id) : 0;
 
+    // Check if others (not the current user) have voted for this chunk
+    const hasOtherVotes = chunk && poll && selectedParticipant
+      ? storageUtils.getVotesForChunk(poll, chunk.id)
+          .some(v => v.participantName !== selectedParticipant)
+      : false;
+
     // In create mode with blocked date toggle enabled, all dates are clickable
     // Otherwise, blocked dates are not clickable
     const isClickable =
@@ -149,15 +155,29 @@ const Calendar = ({
         ((mode === 'create' && canCreateChunkFromDate(date)) ||
         (mode === 'vote' && chunk !== undefined && selectedParticipant)));
 
+    // Determine background color based on state
+    let bgClass = 'bg-white';
+    if (blocked) {
+      bgClass = 'bg-gray-200 line-through text-gray-500';
+    } else if (isVoted) {
+      // User's own vote - bright green background
+      bgClass = 'bg-gradient-to-br from-green-400 to-emerald-500 text-white font-bold';
+    } else if (hasOtherVotes && mode === 'vote') {
+      // Others have voted - light blue tint
+      bgClass = 'bg-gradient-to-br from-blue-100 to-purple-100';
+    } else if (isSelected) {
+      // Available chunk but no votes yet - subtle gradient
+      bgClass = 'bg-gradient-to-br from-gray-50 to-gray-100 border border-blue-300';
+    }
+
     return (
       <div
         key={date.toISOString()}
         onClick={() => isClickable && handleDateClick(date)}
         className={`
-          calendar-day relative
-          ${blocked ? 'bg-gray-200 line-through text-gray-500' : isSelected ? 'chunk-selected' : 'bg-white'}
-          ${isVoted ? 'ring-2 ring-green-500 ring-inset' : ''}
-          ${isClickable ? 'chunk-hoverable cursor-pointer' : 'cursor-default opacity-50'}
+          calendar-day relative transition-all duration-200
+          ${bgClass}
+          ${isClickable ? 'chunk-hoverable cursor-pointer hover:scale-105' : 'cursor-default opacity-50'}
           ${isStart && mode === 'vote' ? 'rounded-l-lg' : ''}
         `}
       >
