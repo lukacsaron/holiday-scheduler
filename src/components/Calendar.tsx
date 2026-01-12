@@ -12,6 +12,7 @@ import {
   formatChunk,
 } from '../utils/dateUtils';
 import { storageUtils } from '../utils/api';
+import { getEventsForDate, getPrimaryEventType } from '../utils/events';
 
 interface CalendarProps {
   mode: 'create' | 'vote';
@@ -142,10 +143,14 @@ const Calendar = ({
     const chunk = getChunkForDate(date);
     const voteCount = chunk ? getVoteCountForChunk(chunk.id) : 0;
 
+    // Event markers
+    const events = getEventsForDate(date);
+    const primaryEventType = getPrimaryEventType(date);
+
     // Check if others (not the current user) have voted for this chunk
     const hasOtherVotes = chunk && poll && selectedParticipant
       ? storageUtils.getVotesForChunk(poll, chunk.id)
-          .some(v => v.participantName !== selectedParticipant)
+        .some(v => v.participantName !== selectedParticipant)
       : false;
 
     // In create mode with blocked date toggle enabled, all dates are clickable
@@ -154,7 +159,7 @@ const Calendar = ({
       (mode === 'create' && onBlockedDateToggle) ||
       (!blocked &&
         ((mode === 'create' && canCreateChunkFromDate(date)) ||
-        (mode === 'vote' && chunk !== undefined && selectedParticipant)));
+          (mode === 'vote' && chunk !== undefined && selectedParticipant)));
 
     // Determine background color based on state
     let bgClass = 'bg-white';
@@ -171,6 +176,13 @@ const Calendar = ({
       bgClass = 'bg-gradient-to-br from-gray-50 to-gray-100 border border-blue-300';
     }
 
+    // Event ring styling (layered on top of other states)
+    const eventClass = primaryEventType === 'holiday'
+      ? 'event-holiday'
+      : primaryEventType === 'festival'
+        ? 'event-festival'
+        : '';
+
     return (
       <div
         key={date.toISOString()}
@@ -178,9 +190,11 @@ const Calendar = ({
         className={`
           calendar-day relative transition-all duration-200
           ${bgClass}
+          ${eventClass}
           ${isClickable ? 'chunk-hoverable cursor-pointer hover:scale-105' : 'cursor-default opacity-50'}
           ${isStart && mode === 'vote' ? 'rounded-l-lg' : ''}
         `}
+        title={events.length > 0 ? events.map(e => `${e.emoji || ''} ${e.name}`).join(', ') : undefined}
       >
         {blocked ? (
           <div className="relative z-10 flex items-center justify-center">
@@ -200,7 +214,15 @@ const Calendar = ({
             </svg>
           </div>
         ) : (
-          <span className="relative z-10">{format(date, 'd')}</span>
+          <>
+            <span className="relative z-10">{format(date, 'd')}</span>
+            {/* Event emoji indicator */}
+            {events.length > 0 && (
+              <span className="event-marker">
+                {events[0].emoji}
+              </span>
+            )}
+          </>
         )}
 
         {/* Vote count badge for chunk start */}
@@ -271,6 +293,18 @@ const Calendar = ({
 
   return (
     <div className="w-full relative">
+      {/* Event Legend */}
+      <div className="mb-4 flex flex-wrap gap-4 items-center justify-center text-sm">
+        <div className="legend-item">
+          <div className="legend-dot ring-2 ring-amber-400 bg-amber-50" />
+          <span>🇭🇺 National Holiday</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-dot ring-2 ring-purple-400 bg-purple-50" />
+          <span>🎭 Festival</span>
+        </div>
+      </div>
+
       {/* Desktop: 2-column grid for months */}
       <div className="hidden md:grid md:grid-cols-2 md:gap-6">
         {months.map(renderMonth)}

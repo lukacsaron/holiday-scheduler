@@ -29,13 +29,14 @@ export const chunksOverlap = (chunk1: DateChunk, chunk2: DateChunk): boolean => 
   );
 };
 
-// Get all months for the summer period (June - September)
+// Get all months for the summer period (July - November)
 export const getSummerMonths = (year: number = 2026): Date[] => {
   return [
-    new Date(year, 5, 1),  // June
     new Date(year, 6, 1),  // July
     new Date(year, 7, 1),  // August
     new Date(year, 8, 1),  // September
+    new Date(year, 9, 1),  // October
+    new Date(year, 10, 1), // November
   ];
 };
 
@@ -65,15 +66,43 @@ export const formatChunk = (chunk: DateChunk): string => {
 };
 
 // Check if a date chunk can be created starting from a specific date
-// (i.e., ensure all 4 days are within the summer months)
+// (i.e., ensure all 4 days are within the allowed periods)
 export const canCreateChunkFromDate = (startDate: Date): boolean => {
   const endDate = addDays(startDate, 3);
 
-  // Check if both start and end are within June-September
+  // Check start date criteria
   const startMonth = startDate.getMonth();
+  const startDay = startDate.getDate();
+
+  // Logic: 
+  // 1. If July (6), must be 15th or later
+  // 2. If Aug-Oct (7-9), any day is fine
+  // 3. If Nov (10), any day is fine (though typically we might want to check if the chunk ENDS in Nov too)
+
+  // The user requirement said: "Remove June and July, add October and November" then "2nd half of July can stay".
+  // Assuming "add October and November" means full months.
+
+  // Check if date is valid start date
+  const isValidStartDate =
+    (startMonth === 6 && startDay >= 15) ||
+    (startMonth >= 7 && startMonth <= 10);
+
+  if (!isValidStartDate) return false;
+
+  // Also enable strict checking that end date doesn't exceed bounds if needed, 
+  // but typically 'canCreateChunk' just checks if the start date initiates a valid block.
+  // However, usually we want the whole chunk to be valid. The previous code checked start and end month.
+  // Previous: startMonth >= 5 && startMonth <= 8 && endMonth >= 5 && endMonth <= 8;
+
   const endMonth = endDate.getMonth();
 
-  return startMonth >= 5 && startMonth <= 8 && endMonth >= 5 && endMonth <= 8;
+  // We need to ensure the end date doesn't go beyond November.
+  // Since our valid start range allows up to Nov 30, a chunk starting Nov 30 ends in Dec.
+  // We should probably ensure the generated chunk stays within the allowable year/season if strict.
+  // Given previous code: endMonth <= 8 (Sept). 
+  // I will enforce endMonth <= 10 (Nov).
+
+  return endMonth <= 10;
 };
 
 // Check if two dates are the same day
