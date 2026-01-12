@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Calendar from '../components/Calendar';
 import { Poll } from '../types';
 import { api, storageUtils } from '../utils/api';
-import { formatChunk } from '../utils/dateUtils';
+import { formatChunk, canCreateChunkFromDate } from '../utils/dateUtils';
 
 const PollPage = () => {
   const { pollId } = useParams<{ pollId: string }>();
@@ -63,6 +63,8 @@ const PollPage = () => {
     if (!poll) return [];
 
     return [...poll.dateChunks]
+      // Filter out chunks outside the valid date range (handles legacy data)
+      .filter(chunk => canCreateChunkFromDate(chunk.startDate))
       .map(chunk => ({
         chunk,
         voteCount: storageUtils.getVotesForChunk(poll, chunk.id).length,
@@ -253,8 +255,10 @@ const PollPage = () => {
               <h3 className="text-xl font-semibold text-gray-800 mb-4">By Participant</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {poll.participants.map(participant => {
-                  // Only count votes for chunks that still exist (filter out votes on removed dates)
-                  const activeChunkIds = poll.dateChunks.map(c => c.id);
+                  // Only count votes for chunks that still exist AND are within valid date range
+                  const activeChunkIds = poll.dateChunks
+                    .filter(c => canCreateChunkFromDate(c.startDate))
+                    .map(c => c.id);
                   const participantVotes = poll.votes.filter(
                     v => v.participantName === participant && activeChunkIds.includes(v.dateChunkId)
                   );
