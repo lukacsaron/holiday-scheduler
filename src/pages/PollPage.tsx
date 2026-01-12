@@ -213,8 +213,8 @@ const PollPage = () => {
                 <div
                   key={chunk.id}
                   className={`p-4 rounded-xl transition-all ${voteCount > 0
-                      ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300'
-                      : 'bg-gray-50 border-2 border-gray-200'
+                    ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300'
+                    : 'bg-gray-50 border-2 border-gray-200'
                     }`}
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -253,7 +253,11 @@ const PollPage = () => {
               <h3 className="text-xl font-semibold text-gray-800 mb-4">By Participant</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {poll.participants.map(participant => {
-                  const participantVotes = poll.votes.filter(v => v.participantName === participant);
+                  // Only count votes for chunks that still exist (filter out votes on removed dates)
+                  const activeChunkIds = poll.dateChunks.map(c => c.id);
+                  const participantVotes = poll.votes.filter(
+                    v => v.participantName === participant && activeChunkIds.includes(v.dateChunkId)
+                  );
                   const votedDates = participantVotes.map(v => {
                     const chunk = poll.dateChunks.find(c => c.id === v.dateChunkId);
                     return chunk ? formatChunk(chunk) : '';
@@ -263,8 +267,8 @@ const PollPage = () => {
                     <div
                       key={participant}
                       className={`p-4 rounded-lg ${votedDates.length > 0
-                          ? 'bg-blue-50 border-2 border-blue-300'
-                          : 'bg-gray-50 border-2 border-gray-200'
+                        ? 'bg-blue-50 border-2 border-blue-300'
+                        : 'bg-gray-50 border-2 border-gray-200'
                         }`}
                     >
                       <div className="flex items-center gap-2 mb-2">
