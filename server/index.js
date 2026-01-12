@@ -100,6 +100,25 @@ app.get('/api/polls', (req, res) => {
   }
 });
 
+// Update a poll
+app.put('/api/polls/:pollId', (req, res) => {
+  try {
+    const { pollId } = req.params;
+    const updates = req.body;
+
+    const updatedPoll = pollsDb.updatePoll(pollId, updates);
+
+    if (!updatedPoll) {
+      return res.status(404).json({ error: 'Poll not found' });
+    }
+
+    res.json(updatedPoll);
+  } catch (error) {
+    console.error('Error updating poll:', error);
+    res.status(500).json({ error: 'Failed to update poll' });
+  }
+});
+
 // Serve static files from the frontend build in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(join(__dirname, '../dist')));

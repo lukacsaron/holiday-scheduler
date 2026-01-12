@@ -136,6 +136,44 @@ export const pollsDb = {
     `);
 
     return stmt.all();
+  },
+
+  // Update an existing poll (preserves votes - they're just hidden if chunks are removed)
+  updatePoll: (pollId, updates) => {
+    const poll = pollsDb.getPoll(pollId);
+    if (!poll) return null;
+
+    // Build dynamic update query
+    const fields = [];
+    const values = [];
+
+    if (updates.title !== undefined) {
+      fields.push('title = ?');
+      values.push(updates.title);
+    }
+    if (updates.participants !== undefined) {
+      fields.push('participants = ?');
+      values.push(JSON.stringify(updates.participants));
+    }
+    if (updates.dateChunks !== undefined) {
+      fields.push('date_chunks = ?');
+      values.push(JSON.stringify(updates.dateChunks));
+    }
+    if (updates.blockedDates !== undefined) {
+      fields.push('blocked_dates = ?');
+      values.push(JSON.stringify(updates.blockedDates));
+    }
+
+    if (fields.length === 0) return poll;
+
+    values.push(pollId);
+    const stmt = db.prepare(`
+      UPDATE polls SET ${fields.join(', ')} WHERE id = ?
+    `);
+    stmt.run(...values);
+
+    // Return updated poll with votes (votes are preserved, frontend filters by active chunks)
+    return pollsDb.getPoll(pollId);
   }
 };
 

@@ -121,4 +121,24 @@ export const pollsDb = {
       createdAt: poll.createdAt,
     }));
   },
+
+  // Update an existing poll (preserves votes - they're just hidden if chunks are removed)
+  updatePoll: (pollId, updates) => {
+    const db = readDb();
+    const poll = db.polls[pollId];
+
+    if (!poll) return null;
+
+    // Update only allowed fields
+    if (updates.title !== undefined) poll.title = updates.title;
+    if (updates.participants !== undefined) poll.participants = updates.participants;
+    if (updates.dateChunks !== undefined) poll.dateChunks = updates.dateChunks;
+    if (updates.blockedDates !== undefined) poll.blockedDates = updates.blockedDates;
+
+    db.polls[pollId] = poll;
+    writeDb(db);
+
+    // Return updated poll with votes (votes are preserved, frontend filters by active chunks)
+    return pollsDb.getPoll(pollId);
+  },
 };

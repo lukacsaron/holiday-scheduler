@@ -212,11 +212,10 @@ const PollPage = () => {
               {sortedChunks.map(({ chunk, voteCount, voters }) => (
                 <div
                   key={chunk.id}
-                  className={`p-4 rounded-xl transition-all ${
-                    voteCount > 0
+                  className={`p-4 rounded-xl transition-all ${voteCount > 0
                       ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300'
                       : 'bg-gray-50 border-2 border-gray-200'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex-1">
@@ -263,16 +262,14 @@ const PollPage = () => {
                   return (
                     <div
                       key={participant}
-                      className={`p-4 rounded-lg ${
-                        votedDates.length > 0
+                      className={`p-4 rounded-lg ${votedDates.length > 0
                           ? 'bg-blue-50 border-2 border-blue-300'
                           : 'bg-gray-50 border-2 border-gray-200'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-2 mb-2">
-                        <div className={`w-3 h-3 rounded-full ${
-                          votedDates.length > 0 ? 'bg-blue-500' : 'bg-gray-300'
-                        }`} />
+                        <div className={`w-3 h-3 rounded-full ${votedDates.length > 0 ? 'bg-blue-500' : 'bg-gray-300'
+                          }`} />
                         <div className="font-bold text-gray-900">{participant}</div>
                       </div>
                       {votedDates.length > 0 ? (
@@ -296,8 +293,27 @@ const PollPage = () => {
           </div>
         )}
 
-        {/* Share Link */}
-        <div className="mt-8 text-center">
+        {/* Action Buttons */}
+        <div className="mt-8 flex justify-center gap-4 flex-wrap">
+          <button
+            onClick={() => navigate(`/poll/${pollId}/edit`)}
+            className="btn-secondary inline-flex items-center gap-2"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+            Edit Poll
+          </button>
           <button
             onClick={() => {
               const url = window.location.href;

@@ -94,6 +94,34 @@ export const api = {
 
     return response.json();
   },
+
+  // Update a poll
+  updatePoll: async (pollId: string, updates: Partial<Poll>): Promise<Poll> => {
+    const response = await fetch(`${API_BASE_URL}/api/polls/${pollId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updates),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update poll');
+    }
+
+    const data = await response.json();
+
+    // Convert date strings back to Date objects
+    return {
+      ...data,
+      dateChunks: data.dateChunks.map((chunk: any) => ({
+        ...chunk,
+        startDate: new Date(chunk.startDate),
+        endDate: new Date(chunk.endDate),
+      })),
+      blockedDates: data.blockedDates.map((date: string) => new Date(date)),
+    };
+  },
 };
 
 // Helper functions to maintain compatibility with storage utils
